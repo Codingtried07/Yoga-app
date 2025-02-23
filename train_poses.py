@@ -64,7 +64,7 @@ def train_yoga_detector():
                     print(pose_info['instructions'])
                 
                 # Collect samples
-                samples = detector.collect_training_data(pose_name, num_samples=30)
+                samples = detector.collect_training_data(pose_name, num_samples=90)
                 print(f"\nCollected {samples} samples for {pose_name}")
             else:
                 print("\nInvalid choice. Please try again.")
