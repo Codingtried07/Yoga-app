@@ -1,116 +1,103 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>YogaAI - Pose Detector</title>
-    <link rel="stylesheet" href="index.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    <style>
-        .pose-detector-container {
-            max-width: 1200px;
-            margin: 2rem auto;
-            padding: 1rem;
-        }
-
-        .video-container {
-            position: relative;
-            width: 100%;
-            max-width: 800px;
-            margin: 0 auto;
-            background: rgba(255, 255, 255, 0.9);
-            padding: 1rem;
-            border-radius: 1rem;
-        }
-
-        #video {
-            width: 100%;
-            border-radius: 0.5rem;
-        }
-
-        .controls {
-            margin-top: 1rem;
-            display: flex;
-            justify-content: center;
-            gap: 1rem;
-        }
-
-        .pose-info {
-            margin-top: 2rem;
-            background: rgba(255, 255, 255, 0.9);
-            padding: 2rem;
-            border-radius: 1rem;
-            text-align: center;
-        }
-
-        .pose-info h2 {
-            color: #006d77;
-            margin-bottom: 1rem;
-        }
-
-        .pose-stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin-top: 1rem;
-        }
-
-        .stat-card {
-            background: white;
-            padding: 1rem;
-            border-radius: 0.5rem;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        .stat-card h3 {
-            color: #00abbd;
-            margin-bottom: 0.5rem;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>YogaAI - Pose Detector</title>
+  <!-- Link your custom CSS here -->
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" />
 </head>
 <body>
-    <nav class="gradient-bg">
-        <div class="container">
-            <a href="index.html" class="nav-brand">
-                <i class="bi bi-flower1"></i>
-                <h1>YogaAI</h1>
-            </a>
-        </div>
-    </nav>
+  <!-- Navigation Bar -->
+  <nav class="gradient-bg">
+    <div class="container">
+      <a href="index.html" class="nav-brand">
+        <i class="bi bi-flower1"></i>
+        <h1>YogaAI</h1>
+      </a>
+    </div>
+  </nav>
 
-    <div class="pose-detector-container">
-        <div class="video-container glass-effect">
-            <video id="video" autoplay playsinline></video>
-            <canvas id="poseCanvas" style="display: none;"></canvas>
-            <div class="controls">
-                <button id="startButton" class="gradient-bg">
-                    Start Detection
-                </button>
-                <button id="stopButton" class="gradient-bg" style="display: none;">
-                    Stop Detection
-                </button>
-            </div>
+  <!-- Main Container -->
+  <div class="main-container">
+    <!-- Top Row: Camera (left) and Instructions (right) -->
+    <div class="top-row">
+      <!-- Left Column: Larger Camera + Accuracy Meter -->
+      <div class="left-col">
+        <!-- Video Feed -->
+        <video id="video" class="video" autoplay playsinline></video>
+        <canvas id="poseCanvas" style="display: none;"></canvas>
+
+        <!-- Accuracy Meter as a Progress Bar + Timer -->
+        <div class="accuracy-meter">
+          <h3>Accuracy Meter</h3>
+          <div class="progress-container">
+            <div id="progressBar" class="progress-bar"></div>
+          </div>
+          <p>Time in Pose: <span id="poseTimer">0s</span></p>
+        </div>
+      </div>
+
+      <!-- Right Column: Level, Pose Instructions, Pose/Confidence Info -->
+      <div class="right-col">
+        <!-- Level Box -->
+        <div class="level-box">
+          <h2 id="levelTitle">Level 1</h2>
+          <h3 id="poseTitle">Mountain Pose</h3>
+
+          <!-- Pose Image -->
+          <div class="pose-image">
+            <img src="images/mountain_pose.jpeg" alt="Mountain Pose" />
+          </div>
+
+          <div class="instructions">
+            <ul>
+              <li>Arms at sides, palms forward</li>
+              <li>Feet hip-width apart</li>
+              <li>Spine straight, shoulders relaxed</li>
+              <li>Hold for 10 seconds</li>
+            </ul>
+          </div>
         </div>
 
+        <!-- Current Pose & Confidence -->
         <div class="pose-info">
-            <h2>Real-time Pose Analysis</h2>
-            <div class="pose-stats">
-                <div class="stat-card">
-                    <h3>Current Pose</h3>
-                    <p id="currentPose">Not detected</p>
-                </div>
-                <div class="stat-card">
-                    <h3>Confidence</h3>
-                    <p id="poseConfidence">0%</p>
-                </div>
-                <div class="stat-card">
-                    <h3>Time in Pose</h3>
-                    <p id="poseTimer">0s</p>
-                </div>
-            </div>
+          <p>Current Pose: <span id="currentPose">Unknown</span></p>
+          <p>Confidence: <span id="poseConfidence">0%</span></p>
         </div>
+      </div>
     </div>
 
-    <script src="pose_detector.js"></script>
+    <!-- Bottom Row: Buttons + Level Tracker -->
+    <div class="bottom-row">
+      <!-- Buttons -->
+      <div class="buttons">
+        <button id="startButton" class="gradient-bg">Start Task</button>
+        <button id="nextLevelButton" class="gradient-bg" disabled>Next Level</button>
+        <button id="skipLevelButton" class="gradient-bg">Skip Level</button>
+        <button id="quitButton" class="gradient-bg">Quit</button>
+      </div>
+
+      <!-- Level Tracker -->
+      <div class="level-tracker">
+        <div class="level-circle" data-level="1">1</div>
+        <div class="level-circle" data-level="2">2</div>
+        <div class="level-circle" data-level="3">3</div>
+        <div class="level-circle" data-level="4">4</div>
+        <div class="level-circle" data-level="5">5</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quit Button Functionality -->
+  <script>
+    document.getElementById("quitButton").addEventListener("click", function(){
+      window.location.href = "index.html";
+    });
+  </script>
+
+  <!-- Pose Detector Script -->
+  <script src="pose_detector.js"></script>
 </body>
 </html>
