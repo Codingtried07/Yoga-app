@@ -16,7 +16,7 @@ from yoga_detector import YogaPoseDetector
 class YogaApp:
     def __init__(self, window):
         self.window = window
-        self.window.title("Yoga Pose Game")
+        self.window.title("Yoga Pose Challenge")
         self.window.geometry("1024x768")
         
         # Game state variables
@@ -89,7 +89,7 @@ class YogaApp:
         
         self.instruction_text = tk.Text(instruction_frame, height=8, width=30, wrap=tk.WORD)
         self.instruction_text.pack(fill=tk.BOTH, expand=True)
-        self.instruction_text.insert(tk.END, "Welcome to Yoga Pose Game!\nPress 'Start Game' to begin.")
+        self.instruction_text.insert(tk.END, "Welcome to Yoga Pose Challenge\nPress 'Start Game' to begin.")
         self.instruction_text.config(state='disabled')
         
         # Game frame
@@ -121,7 +121,7 @@ class YogaApp:
         game_buttons = ttk.Frame(self.game_frame)
         game_buttons.pack(pady=5)
         
-        self.start_game_btn = ttk.Button(game_buttons, text="Start Game", command=self.start_game)
+        self.start_game_btn = ttk.Button(game_buttons, text="Start Challenge", command=self.start_game)
         self.start_game_btn.pack(side=tk.LEFT, padx=5)
         
         self.next_level_btn = ttk.Button(game_buttons, text="Next Level", command=self.next_level)

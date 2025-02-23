@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YogaAI - Pose Detector</title>
+    <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        .pose-detector-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 1rem;
+        }
+
+        .video-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 1rem;
+            border-radius: 1rem;
+        }
+
+        #video {
+            width: 100%;
+            border-radius: 0.5rem;
+        }
+
+        .controls {
+            margin-top: 1rem;
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .pose-info {
+            margin-top: 2rem;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 2rem;
+            border-radius: 1rem;
+            text-align: center;
+        }
+
+        .pose-info h2 {
+            color: #006d77;
+            margin-bottom: 1rem;
+        }
+
+        .pose-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-card h3 {
+            color: #00abbd;
+            margin-bottom: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <nav class="gradient-bg">
+        <div class="container">
+            <a href="index.html" class="nav-brand">
+                <i class="bi bi-flower1"></i>
+                <h1>YogaAI</h1>
+            </a>
+        </div>
+    </nav>
+
+    <div class="pose-detector-container">
+        <div class="video-container glass-effect">
+            <video id="video" autoplay playsinline></video>
+            <canvas id="poseCanvas" style="display: none;"></canvas>
+            <div class="controls">
+                <button id="startButton" class="gradient-bg">
+                    Start Detection
+                </button>
+                <button id="stopButton" class="gradient-bg" style="display: none;">
+                    Stop Detection
+                </button>
+            </div>
+        </div>
+
+        <div class="pose-info">
+            <h2>Real-time Pose Analysis</h2>
+            <div class="pose-stats">
+                <div class="stat-card">
+                    <h3>Current Pose</h3>
+                    <p id="currentPose">Not detected</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Confidence</h3>
+                    <p id="poseConfidence">0%</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Time in Pose</h3>
+                    <p id="poseTimer">0s</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="pose_detector.js"></script>
+</body>
+</html>

@@ -30,8 +30,10 @@ nav {
 }
 
 nav .container {
-    max-width: 100%;  /* Make container full width */
-    padding: 0 4rem;  /* Increase padding significantly */
+    max-width: 100%;
+    /* Make container full width */
+    padding: 0 4rem;
+    /* Increase padding significantly */
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -125,8 +127,13 @@ button:disabled {
 }
 
 @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
 /* Recommendations Section */
@@ -248,8 +255,10 @@ button:disabled {
 
 .recommendation-card {
     background: white;
-    max-width: 900px; /* Set max width */
-    margin: 40px auto; /* Center the card */
+    max-width: 900px;
+    /* Set max width */
+    margin: 40px auto;
+    /* Center the card */
     padding: 20px;
     border-radius: 12px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
@@ -276,4 +285,111 @@ button:disabled {
     justify-content: center;
     gap: 20px;
     margin-top: 20px;
+}
+
+.pose-detection-section {
+    margin: 2rem 0;
+    padding: 2rem;
+    border-radius: 1rem;
+}
+
+.detection-intro {
+    color: #333;
+    margin-bottom: 1.5rem;
+}
+
+.pose-controls {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+.pose-result {
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: #006d77;
+}
+
+.video-container {
+    position: relative;
+    width: 100%;
+    max-width: 640px;
+    margin: 1rem auto;
+}
+
+.video-container video,
+.video-container canvas {
+    width: 100%;
+    height: auto;
+    border-radius: 0.5rem;
+}
+
+.practice-tips {
+    margin: 2rem 0;
+    padding: 2rem;
+    border-radius: 1rem;
+}
+
+.practice-tips h3 {
+    color: #006d77;
+    margin-bottom: 1rem;
+}
+
+.practice-tips ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.practice-tips li {
+    margin: 0.5rem 0;
+    padding-left: 1.5rem;
+    position: relative;
+}
+
+.practice-tips li::before {
+    content: "•";
+    color: #00abbd;
+    position: absolute;
+    left: 0;
+}
+
+.error-message {
+    background-color: #fee2e2;
+    border: 1px solid #ef4444;
+    color: #991b1b;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    margin: 1rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.error-message i {
+    font-size: 1.25rem;
+}
+
+footer {
+    margin-top: 4rem;
+    padding: 2rem 0;
+    color: white;
+}
+
+.footer-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+.footer-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.5rem;
+}
+
+.hidden {
+    display: none !important;
 }

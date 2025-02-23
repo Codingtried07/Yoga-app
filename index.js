@@ -1,11 +1,11 @@
-async function getYogaRecommendations() {
+async function getYogaRecommendations() {  
     const healthCondition = document.getElementById('healthCondition').value;
     if (!healthCondition.trim()) {
         alert('Please describe your health conditions');
         return;
     }
 
-    // Show loading state
+    // Show loading state 
     const button = document.querySelector('button');
     const buttonText = document.getElementById('buttonText');
     const loadingSpinner = document.getElementById('loadingSpinner');
@@ -26,7 +26,7 @@ async function getYogaRecommendations() {
                     content: [
                         {
                             type: "text",
-                            text: `As a yoga instructor, please analyze these health conditions and provide 3 specific yoga poses. For each pose, include: 1) The pose name 2) Key benefits 3) Detailed step-by-step instructions 4) Important precautions 5) Duration recommendation./n Health conditions: ${healthCondition}`
+                            text: `As a yoga instructor, please analyze these health conditions and provide 3 specific yoga poses. For each pose, include: 1) The pose name 2) Key benefits 3) Detailed step-by-step instructions 4) Important precautions 5) Duration recommendation.\n Health conditions: ${healthCondition}`
                         }
                     ]
                 }]
@@ -41,17 +41,15 @@ async function getYogaRecommendations() {
 
         // Show recommendations section
         document.getElementById('recommendations').classList.remove('hidden');
-        
-        // Reset button state
-        button.disabled = false;
-        buttonText.textContent = 'Get Personalized Yoga Plan';
-        loadingSpinner.classList.add('hidden');
-        
+
         // Smooth scroll to recommendations
         document.getElementById('recommendations').scrollIntoView({ behavior: 'smooth' });
+
     } catch (error) {
         console.error('Error:', error);
         alert('An error occurred. Please try again.');
+    } finally {
+        // Reset button state
         button.disabled = false;
         buttonText.textContent = 'Get Personalized Yoga Plan';
         loadingSpinner.classList.add('hidden');
@@ -59,20 +57,19 @@ async function getYogaRecommendations() {
 }
 
 function parseAIResponse(response) {
-    const poses = response.split(/d+\./g).filter(pose => pose.trim());
+    // Split response into pose sections
+    const poses = response.split(/\d+\./).filter(pose => pose.trim());
     return poses.map(pose => {
         const lines = pose.split('\n').filter(line => line.trim());
         const poseName = lines[0].trim();
         return {
             name: poseName,
-            details: formatYogaDetails(pose),
-            image: `https://source.unsplash.com/400x300/?yoga,${encodeURIComponent(poseName)}`
+            details: formatYogaDetails(pose)
         };
     });
 }
 
 function formatYogaDetails(poseText) {
-    // Split the text into sections and format it with appropriate styling
     const sections = poseText.split('\n').filter(line => line.trim());
     return sections.map(section => {
         if (section.toLowerCase().includes('benefits:')) {
@@ -91,18 +88,27 @@ function formatYogaDetails(poseText) {
 function displayRecommendations(recommendations) {
     const grid = document.getElementById('recommendationsGrid');
     grid.innerHTML = '';
-    
+
     recommendations.forEach((rec, index) => {
         const card = document.createElement('div');
-        //card.className = 'yoga-card rounded-lg shadow-lg overflow-hidden';
         card.innerHTML = `
             <div class="">
-                ${rec.name}'/n'
-                ${index + 1}
-                ${rec.details}
-
+                <h3 class="text-xl font-bold mb-3">${rec.name}</h3>
+                <div class="text-gray-700">
+                    ${rec.details}
+                </div>
             </div>
         `;
         grid.appendChild(card);
     });
 }
+
+// Event Listeners
+document.addEventListener('DOMContentLoaded', () => {
+    const capturePoseBtn = document.getElementById('capturePose');
+    if (capturePoseBtn) {
+        capturePoseBtn.addEventListener('click', () => {
+            window.open('pose_detector.html', '_blank');
+        });
+    }
+});
