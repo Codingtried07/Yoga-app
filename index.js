@@ -1,4 +1,40 @@
-async function getYogaRecommendations() {  
+// Global state variables
+let yogaPosesData = null;
+
+// Load yoga poses data when the page loads
+async function loadYogaPosesData() {
+    try {
+        const response = await fetch('yoga-api.json');
+        yogaPosesData = await response.json();
+        console.log('Yoga poses data loaded successfully');
+    } catch (error) {
+        console.error('Error loading yoga poses data:', error);
+    }
+}
+
+// Initialize data on page load
+document.addEventListener('DOMContentLoaded', () => {
+    loadYogaPosesData();
+    initializeEventListeners();
+});
+
+function initializeEventListeners() {
+    // Initialize pose detection button
+    const capturePoseBtn = document.getElementById('capturePose');
+    if (capturePoseBtn) {
+        capturePoseBtn.addEventListener('click', () => {
+            window.open('pose_detector.html', '_blank');
+        });
+    }
+
+    // Initialize recommendation button
+    const recommendBtn = document.querySelector('button');
+    if (recommendBtn) {
+        recommendBtn.addEventListener('click', getYogaRecommendations);
+    }
+}
+
+async function getYogaRecommendations() {
     const healthCondition = document.getElementById('healthCondition').value;
     if (!healthCondition.trim()) {
         alert('Please describe your health conditions');
@@ -14,29 +50,73 @@ async function getYogaRecommendations() {
     loadingSpinner.classList.remove('hidden');
 
     try {
-        const response = await fetch('https://r0c8kgwocscg8gsokogwwsw4.zetaverse.one/ai', {
-            method: 'POST',
-            headers: {
-                'Authorization': 'Bearer A8DMqQzWsdh0ZNRwYwCdRGjHpWt1',
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                messages: [{
-                    role: "user",
-                    content: [
-                        {
-                            type: "text",
-                            text: `As a yoga instructor, please analyze these health conditions and provide 3 specific yoga poses. For each pose, include: 1) The pose name 2) Key benefits 3) Detailed step-by-step instructions 4) Important precautions 5) Duration recommendation.\n Health conditions: ${healthCondition}`
-                        }
-                    ]
-                }]
-            })
+        if (!yogaPosesData) {
+            // Reload data if not available
+            await loadYogaPosesData();
+        }
+
+        if (!yogaPosesData) {
+            throw new Error('Unable to load yoga poses data');
+        }
+
+        // Filter out empty poses and select relevant poses based on health conditions
+        const validPoses = yogaPosesData.filter(pose =>
+            pose.english_name &&
+            pose.procedure.length > 0 &&
+            pose.benefits.length > 0 &&
+            pose.contraindications.length > 0
+        );
+
+        // Create an array of relevant health conditions and target areas
+        const userConditions = healthCondition.toLowerCase()
+            .split(/[,.\s]+/) // Split on commas, periods, or whitespace
+            .filter(word => word.length > 3); // Filter out short words
+
+        // Score each pose based on relevance to user's conditions
+        const scoredPoses = validPoses.map(pose => {
+            let score = 0;
+            const poseText = [
+                pose.english_name.toLowerCase(),
+                ...pose.benefits.map(b => b.toLowerCase()),
+                ...pose.target_body_parts.map(t => t.toLowerCase()),
+                pose.sanskrit_name.toLowerCase()
+            ].join(' ');
+
+            // Check each user condition against pose text
+            userConditions.forEach(condition => {
+                if (poseText.includes(condition)) {
+                    score += 1;
+                }
+            });
+
+            // Add bonus points for poses with more complete information
+            score += (pose.benefits.length / 10); // Slight bonus for number of benefits
+            score += (pose.procedure.length / 10); // Slight bonus for detailed procedure
+
+            return { pose, score };
         });
 
-        const data = await response.json();
-        
+        // Sort poses by score and get top 3
+        const recommendedPoses = scoredPoses
+            .sort((a, b) => b.score - a.score)
+            .slice(0, 3)
+            .map(item => item.pose);
+
+        // Format the poses for display
+        const formattedResponse = recommendedPoses.map((pose, index) => `
+            ${index + 1}. ${pose.english_name} (${pose.sanskrit_name})
+            
+            Benefits: ${pose.benefits.join(', ')}
+            
+            Steps: ${pose.procedure.join('\n')}
+            
+            Precautions: ${pose.contraindications.join(', ')}
+            
+            Duration: Hold the pose for 30-60 seconds while maintaining steady breathing.
+        `).join('\n\n');
+
         // Parse and display recommendations
-        const recommendations = parseAIResponse(data.message);
+        const recommendations = parseAIResponse(formattedResponse);
         displayRecommendations(recommendations);
 
         // Show recommendations section
@@ -47,7 +127,7 @@ async function getYogaRecommendations() {
 
     } catch (error) {
         console.error('Error:', error);
-        alert('An error occurred. Please try again.');
+        alert('An error occurred while generating recommendations. Please try again.');
     } finally {
         // Reset button state
         button.disabled = false;
@@ -71,29 +151,61 @@ function parseAIResponse(response) {
 
 function formatYogaDetails(poseText) {
     const sections = poseText.split('\n').filter(line => line.trim());
+
     return sections.map(section => {
+        // Handle empty sections
+        if (!section || !section.trim()) return '';
+
+        // Format different sections with appropriate styling
         if (section.toLowerCase().includes('benefits:')) {
-            return `<div class="mt-3"><strong class="text-teal-700">✨ Benefits:</strong>${section.split(':')[1]}</div>`;
-        } else if (section.toLowerCase().includes('steps:') || section.toLowerCase().includes('instructions:')) {
-            return `<div class="mt-3"><strong class="text-teal-700">📝 Steps:</strong>${section.split(':')[1]}</div>`;
-        } else if (section.toLowerCase().includes('precautions:')) {
-            return `<div class="mt-3"><strong class="text-teal-700">⚠️ Precautions:</strong>${section.split(':')[1]}</div>`;
-        } else if (section.toLowerCase().includes('duration:')) {
-            return `<div class="mt-3"><strong class="text-teal-700">⏱️ Duration:</strong>${section.split(':')[1]}</div>`;
+            const benefits = section.split(':')[1] || '';
+            return `<div class="mt-3">
+                <strong class="text-teal-700">✨ Benefits:</strong>
+                <span class="ml-2">${benefits}</span>
+            </div>`;
         }
-        return section;
+        else if (section.toLowerCase().includes('steps:')) {
+            const steps = section.split(':')[1] || '';
+            return `<div class="mt-3">
+                <strong class="text-teal-700">📝 Steps:</strong>
+                <span class="ml-2">${steps}</span>
+            </div>`;
+        }
+        else if (section.toLowerCase().includes('precautions:')) {
+            const precautions = section.split(':')[1] || '';
+            return `<div class="mt-3">
+                <strong class="text-teal-700">⚠️ Precautions:</strong>
+                <span class="ml-2">${precautions}</span>
+            </div>`;
+        }
+        else if (section.toLowerCase().includes('duration:')) {
+            const duration = section.split(':')[1] || '';
+            return `<div class="mt-3">
+                <strong class="text-teal-700">⏱️ Duration:</strong>
+                <span class="ml-2">${duration}</span>
+            </div>`;
+        }
+        return `<div class="mt-2">${section}</div>`;
     }).join('');
 }
 
 function displayRecommendations(recommendations) {
     const grid = document.getElementById('recommendationsGrid');
+    if (!grid) {
+        console.error('Recommendations grid element not found');
+        return;
+    }
+
+    // Clear existing recommendations
     grid.innerHTML = '';
 
+    // Create and append recommendation cards
     recommendations.forEach((rec, index) => {
         const card = document.createElement('div');
+        card.className = 'bg-white rounded-lg shadow-md p-6 mb-6';
         card.innerHTML = `
-            <div class="">
-                <h3 class="text-xl font-bold mb-3">${rec.name}</h3>
+            <div class="recommendation-content">
+                <h3 class="text-xl font-bold mb-3 text-teal-700">${rec.name}</h3>
                 <div class="text-gray-700">
                     ${rec.details}
                 </div>
@@ -103,12 +215,19 @@ function displayRecommendations(recommendations) {
     });
 }
 
-// Event Listeners
-document.addEventListener('DOMContentLoaded', () => {
-    const capturePoseBtn = document.getElementById('capturePose');
-    if (capturePoseBtn) {
-        capturePoseBtn.addEventListener('click', () => {
-            window.open('pose_detector.html', '_blank');
-        });
+// Error handling function
+function handleError(error, message = 'An error occurred') {
+    console.error(error);
+    const errorMessage = document.getElementById('errorMessage');
+    const errorText = document.getElementById('errorText');
+
+    if (errorMessage && errorText) {
+        errorText.textContent = `${message}: ${error.message}`;
+        errorMessage.classList.remove('hidden');
+        setTimeout(() => {
+            errorMessage.classList.add('hidden');
+        }, 5000);
+    } else {
+        alert(`${message}: ${error.message}`);
     }
-});
+}
