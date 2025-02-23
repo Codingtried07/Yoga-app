@@ -112,7 +112,7 @@ nav .container {
 
 .pose-image img {
   width: 100%;
-  max-width: 300px;
+  max-width: 500px;
   border-radius: 0.5rem;
 }
 
@@ -147,6 +147,8 @@ nav .container {
 .pose-info p {
   margin: 0.5rem 0;
   font-size: 1.3rem;
+  font-weight: bold;
+  color: #333;
 }
 
 /* Timer display */
@@ -164,7 +166,7 @@ nav .container {
 
 /* Progress bar */
 .progress-container {
-  width: 90%;
+  width: 1000%;
   height: 20px;
   background: #e5e7eb;
   border-radius: 10px;
@@ -355,17 +357,18 @@ nav .container {
 
 /* Update/add these styles */
 .timer-display {
-  margin: 1rem 0;
+  margin: 1rem ;
   padding: 1rem;
   border-radius: 0.5rem;
   background: rgba(255, 255, 255, 0.95);
   text-align: center;
+  font-size: 1.2rem;
 }
 
 .timer-display h3 {
   color: #006d77;
   margin-bottom: 1rem;
-  font-size: 1.2rem;
+  font-size: 1.4rem;
 }
 
 .progress-container {
@@ -418,6 +421,8 @@ nav .container {
 .gradient-bg:hover:not(:disabled) {
   transform: translateY(-2px);
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  background: #333;
+  color:#006d77;
 }
 
 /* Level Tracker */
